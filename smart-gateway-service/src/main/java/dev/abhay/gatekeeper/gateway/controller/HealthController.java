@@ -9,13 +9,13 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/health")
-public class HelloController {
+public class HealthController {
 
     private final String serviceName;
     private final String serviceDescription;
 
-    public HelloController(@Value("${info.app.name}") String serviceName,
-                           @Value("${info.app.description}") String serviceDescription){
+    public HealthController(@Value("${info.app.name}") String serviceName,
+                            @Value("${info.app.description}") String serviceDescription){
         this.serviceName=serviceName;
         this.serviceDescription=serviceDescription;
     }
