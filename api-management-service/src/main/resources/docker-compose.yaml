@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: api-management-postgres
+    environment:
+      POSTGRES_DB: api_management
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_ready -U postgres -d api_management"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
