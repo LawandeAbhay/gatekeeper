@@ -30,17 +30,19 @@ public class RouteService {
     private final ObjectMapper objectMapper;
     private final AuditService auditService;
     private final GatewayConfigurationEventService gatewayConfigurationEventService;
+    private final OutboxEventService outboxEventService;
 
     public RouteService(ApiRouteRepository apiRouteRepository,
                         RouteConfigurationVersionRepository routeConfigurationVersionRepository,
                         TenantContext tenantContext, ObjectMapper objectMapper, AuditService auditService,
-                        GatewayConfigurationEventService gatewayConfigurationEventService){
+                        GatewayConfigurationEventService gatewayConfigurationEventService, OutboxEventService outboxEventService){
         this.apiRouteRepository = apiRouteRepository;
         this.routeConfigurationVersionRepository = routeConfigurationVersionRepository;
         this.tenantContext = tenantContext;
         this.objectMapper = objectMapper;
         this.auditService = auditService;
         this.gatewayConfigurationEventService = gatewayConfigurationEventService;
+        this.outboxEventService = outboxEventService;
     }
 
     @Transactional
@@ -69,9 +71,12 @@ public class RouteService {
                 "API_ROUTE", apiRoute.getRouteId(), startedAt,
                 "Route configuration version 1 created");
 
-        gatewayConfigurationEventService.publish("CREATED", organization.getId(),
-                apiRoute.getRouteId(), apiRoute.getConfigurationVersion());
-
+        outboxEventService.saveEvent(
+                "CREATED",
+                organization.getId(),
+                apiRoute.getRouteId(),
+                apiRoute.getConfigurationVersion()
+        );
         return RouteResponse.from(apiRoute);
     }
 
@@ -113,10 +118,12 @@ public class RouteService {
                 route.getRouteId(), startedAt, "Route configuration version " +
                         route.getConfigurationVersion() + " created");
 
-        gatewayConfigurationEventService.publish("UPDATED", organization.getId(),
-                route.getRouteId(), route.getConfigurationVersion());
-
-
+        outboxEventService.saveEvent(
+                "CREATED",
+                organization.getId(),
+                route.getRouteId(),
+                route.getConfigurationVersion()
+        );
         return RouteResponse.from(route);
     }
 
