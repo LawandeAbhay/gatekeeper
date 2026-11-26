@@ -1,0 +1,76 @@
+<configuration>
+
+    <springProperty
+            scope="context"
+            name="appName"
+            source="spring.application.name"
+            defaultValue="gatekeeper"/>
+
+    <property name="CONSOLE_PATTERN"
+              value="%d{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [service=${appName}] [requestId=%X{requestId}] %logger{36} - %msg%n"/>
+
+    <appender name="CONSOLE"
+              class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>${CONSOLE_PATTERN}</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="FILE"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+
+        <file>logs/gatekeeper.log</file>
+
+        <encoder>
+            <pattern>${CONSOLE_PATTERN}</pattern>
+        </encoder>
+
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>logs/archive/gatekeeper-%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <maxFileSize>10MB</maxFileSize>
+            <maxHistory>30</maxHistory>
+            <totalSizeCap>1GB</totalSizeCap>
+        </rollingPolicy>
+
+    </appender>
+
+    <springProfile name="dev">
+
+        <logger name="dev.abhay.gatekeeper" level="DEBUG"/>
+
+        <logger name="org.springframework" level="WARN"/>
+
+        <logger name="org.hibernate" level="WARN"/>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+            <appender-ref ref="FILE"/>
+        </root>
+
+    </springProfile>
+
+    <springProfile name="prod">
+
+        <logger name="dev.abhay.gatekeeper" level="INFO"/>
+
+        <logger name="org.springframework" level="WARN"/>
+
+        <logger name="org.hibernate" level="WARN"/>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+    </springProfile>
+
+    <springProfile name="!dev &amp; !prod">
+
+        <logger name="dev.abhay.gatekeeper" level="INFO"/>
+
+        <root level="INFO">
+            <appender-ref ref="CONSOLE"/>
+        </root>
+
+    </springProfile>
+
+</configuration>

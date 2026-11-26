@@ -102,3 +102,25 @@ CREATE TABLE control_plane_audit_records (
                                              CONSTRAINT pk_control_plane_audit_records PRIMARY KEY (id),
                                              CONSTRAINT fk_audit_organization FOREIGN KEY (organization_id) REFERENCES organizations (id)
 );
+
+CREATE TABLE outbox_events (
+                               id BIGINT NOT NULL AUTO_INCREMENT,
+                               event_id VARCHAR(100) NOT NULL,
+                               aggregate_type VARCHAR(100) NOT NULL,
+                               aggregate_id VARCHAR(200) NOT NULL,
+                               event_type VARCHAR(150) NOT NULL,
+                               event_key VARCHAR(300) NOT NULL,
+                               payload TEXT NOT NULL,
+                               status VARCHAR(30) NOT NULL DEFAULT 'PENDING',
+                               retry_count INTEGER NOT NULL DEFAULT 0,
+                               created_at TIMESTAMP NOT NULL,
+                               published_at TIMESTAMP,
+                               next_retry_at TIMESTAMP,
+                               claimed_until TIMESTAMP,
+
+                               CONSTRAINT pk_outbox_events PRIMARY KEY (id),
+                               CONSTRAINT uk_outbox_events_event_id UNIQUE (event_id)
+);
+
+CREATE INDEX idx_outbox_pending
+    ON outbox_events (status, next_retry_at, created_at);
